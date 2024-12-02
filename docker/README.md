@@ -11,8 +11,6 @@
 The ION node, whether it is validator or fullnode, requires a public IP address. 
 If your server is within an internal network or kubernetes you have to make sure that the required ports are available from the outside.
 
-Also pay attention at [hardware requirements](https://docs.ion.org/participate/run-nodes/full-node) for ION fullnodes and validators. Pods and StatefulSets in this guide imply these requirements. 
-
 It is recommended to everyone to read Docker chapter first in order to get a better understanding about ION Docker image and its parameters.  
 
 ## Docker
