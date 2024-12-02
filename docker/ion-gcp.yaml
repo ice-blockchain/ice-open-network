@@ -27,14 +27,12 @@ spec:
     spec:
       containers:
         - name: validator-engine-container
-          image: ghcr.io/ton-blockchain/ton:latest
+          image: ghcr.io/ice-blockchain/ion:latest
           env:
             - name: PUBLIC_IP
               value: "<PUBLIC_IP>"
             - name: GLOBAL_CONFIG_URL
-              value: "https://api.tontech.io/ton/wallet-mainnet.autoconf.json"
-            - name: DUMP_URL
-              value: "https://dump.ton.org/dumps/latest.tar.lz"
+              value: "https://cdn.ice.io/mainnet/global.config.json"
             - name: LITESERVER
               value: "true"
             - name: VALIDATOR_PORT
@@ -59,7 +57,7 @@ spec:
             - containerPort: 30003
               protocol: TCP
           volumeMounts:
-            - mountPath: "/var/ton-work/db"
+            - mountPath: "/var/ion-work/db"
               name: validator-engine-pvc
           resources:
             requests:

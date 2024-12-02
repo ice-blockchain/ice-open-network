@@ -6,14 +6,14 @@
 4. [Kubernetes deployment on GCP](#deploy-on-gcp-google-cloud-platform)
 5. [Kubernetes deployment on AliCloud](#deploy-on-ali-cloud)
 6. [Troubleshooting](#troubleshooting)
-
 ## Prerequisites
 
-The ION node, whether it is validator or fullnode, requires a public IP address. If your server is within an internal network or Kubernetes, you have to make sure that the required ports are available from the outside.
+The ION node, whether it is validator or fullnode, requires a public IP address. 
+If your server is within an internal network or kubernetes you have to make sure that the required ports are available from the outside.
 
-Also pay attention to [hardware requirements](https://github.com/ice-blockchain/ion-utils/tree/master/documentation/validator/Readme.md) for ION fullnodes and validators. Pods and StatefulSets in this guide imply these requirements.
+Also pay attention at [hardware requirements](https://docs.ion.org/participate/run-nodes/full-node) for ION fullnodes and validators. Pods and StatefulSets in this guide imply these requirements. 
 
-It is recommended that everyone read the Docker chapter first in order to get a better understanding of the ION Docker image and its parameters.  
+It is recommended to everyone to read Docker chapter first in order to get a better understanding about ION Docker image and its parameters.  
 
 ## Docker
 
@@ -21,33 +21,36 @@ It is recommended that everyone read the Docker chapter first in order to get a 
 ```docker pull ghcr.io/ice-blockchain/ion:latest```
 
 ### Configuration
-ION validator-engine supports a number of command line parameters, these parameters can be handed over to the container via environment variables. Below is the list of supported arguments and their default values:
+ION validator-engine supports number of command line parameters, 
+these parameters can be handed over to the container via environment variables. 
+Below is the list of supported arguments and their default values:
 
 | Argument          | Description                                                                                                                                                                               | Mandatory? |                      Default value                      |
 |:------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|:-------------------------------------------------------:|
-| PUBLIC_IP         | This will be a public IP address of your ION node. Normally, it is the same IP address as your server's external IP. This also can be your proxy server or load balancer IP address.       |    yes     |                                                         |
-| GLOBAL_CONFIG_URL | ION global configuration file. Mainnet - https://cdn.ice.io/mainnet/global.config.json                               |     yes     |  |
-| DUMP_URL          | URL to ION dump. If you are using testnet dump, make sure to download global config for testnet.                                                  |     no     |                                                         |
+| PUBLIC_IP         | This will be a public IP address of your ION node. Normally it is the same IP address as your server's external IP. This also can be your proxy server or load balancer IP address.       |    yes     |                                                         |
+| GLOBAL_CONFIG_URL | ION global configuration file. Mainnet - https://ion.org/global-config.json, Testnet - https://ion.org/testnet-global.config.json                                                         |     no     | https://cdn.ice.io/mainnet/global.config.json |
+| DUMP_URL          | URL to ION dump. Specify dump from https://cdn.ice.io/mainnet. Currently not yet deployed on mainnet                                               |     no     |                                                         |
 | VALIDATOR_PORT    | UDP port that must be available from the outside. Used for communication with other nodes.                                                                                                |     no     |                          30001                          |
-| CONSOLE_PORT      | This TCP port is used to access the validator's console. Not necessarily to be opened for external access.                                                                                    |     no     |                          30002                          |
+| CONSOLE_PORT      | This TCP port is used to access validator's console. Not necessarily to be opened for external access.                                                                                    |     no     |                          30002                          |
 | LITE_PORT         | Lite-server's TCP port. Used by lite-client.                                                                                                                                              |     no     |                          30003                          |
-| LITESERVER        | true or false. Set to true if you want an up and running lite-server.                                                                                                                        |     no     |                          false                          |
+| LITESERVER        | true or false. Set to true if you want up and running lite-server.                                                                                                                        |     no     |                          false                          |
 | STATE_TTL         | Node's state will be gc'd after this time (in seconds).                                                                                                                                   |     no     |                          86400                          |
 | ARCHIVE_TTL       | Node's archived blocks will be deleted after this time (in seconds).                                                                                                                      |     no     |                          86400                          |
 | THREADS           | Number of threads used by validator-engine.                                                                                                                                               |     no     |                            8                            |
 | VERBOSITY         | Verbosity level.                                                                                                                                                                          |     no     |                            3                            |
-| CUSTOM_ARG        | Validator-engine might have some undocumented arguments. This is reserved for test purposes.<br/>For example, you can pass **--logname /var/ion-work/log** in order to have log files. |     no     |                                                         |
+| CUSTOM_ARG        | validator-engine might have some undocumented arguments. This is reserved for the test purposes.<br/>For example you can pass **--logname /var/ion-work/log** in order to have log files. |     no     |                                                         |
 
 ### Run the node - the quick way
-The command below runs a Docker container with an ION node that will start the synchronization process.
+The below command runs docker container with a ION node, that will start synchronization process.
 
-Notice **--network host** option, which means that the Docker container will use the network namespace of the host machine. In this case, there is no need to map ports between the host and the container. The container will use the same IP address and ports as the host.
-
-This approach simplifies networking configuration for the container and usually is used on a dedicated server with an assigned public IP.
+Notice **--network host** option, means that the Docker container will use the network namespace of the host machine.
+In this case there is no need to map ports between the host and the container. The container will use the same IP address and ports as the host.
+This approach simplifies networking configuration for the container, and usually is used on the dedicated server with assigned public IP.
 
 Keep in mind that this option can also introduce security concerns because the container has access to the host's network interfaces directly, which might not be desirable in a multi-tenant environment.
 
-Check your firewall configuration and make sure that at least UDP port 43677 is publicly available. Find out your PUBLIC_IP:
+Check your firewall configuration and make sure that at least UDP port 43677 is publicly available.
+Find out your PUBLIC_IP:
 ```
 curl -4 ifconfig.me
 ```
@@ -59,10 +62,12 @@ docker run -d --name ion-node -v /data/db:/var/ion-work/db \
 --network host \
 -it ghcr.io/ice-blockchain/ion
 ```
-If you don't need the lite-server, then remove `-e "LITESERVER=true"`.
+If you don't need Lite-server, then remove -e "LITESERVER=true".
 
 ### Run the node - isolated way
-In production environments, it is recommended to use **Port mapping** feature of Docker's default bridge network. When you use port mapping, Docker allocates a specific port on the host to forward traffic to a port inside the container. This is ideal for running multiple containers with isolated networks on the same host.
+In production environments it is recommended to use **Port mapping** feature of Docker's default bridge network. 
+When you use port mapping, Docker allocates a specific port on the host to forward traffic to a port inside the container.
+This is ideal for running multiple containers with isolated networks on the same host.
 ```
 docker run -d --name ion-node -v /data/db:/var/ion-work/db \
 -e "PUBLIC_IP=<PUBLIC_IP>" \
@@ -75,20 +80,21 @@ docker run -d --name ion-node -v /data/db:/var/ion-work/db \
 -p 443:443/tcp \
 -it ghcr.io/ice-blockchain/ion
 ```
-Adjust ports per your need. Check your firewall configuration and make sure that customized ports (443/udp, 88/tcp, and 443/tcp in this example) are publicly available.
+Adjust ports per your need. 
+Check your firewall configuration and make sure that customized ports (443/udp, 88/tcp and 443/tcp in this example) are publicly available.
 
 ### Verify if ION node is operating correctly
-After executing the command above, check the log files:
+After executing above command check the log files:
 
 ```docker logs ion-node```
 
-This is normal if in the log output for some time (up to 15 minutes) you see messages like:
+This is totally fine if in the log output for some time (up to 15 minutes) you see messages like:
 
 ```log
 failed to download proof link: [Error : 651 : no nodes]
 ```
 
-After some time, you should be able to see multiple messages similar to these below:
+After some time you should be able to see multiple messages similar to these below:
 ```log
 failed to download key blocks: [Error : 652 : adnl query timeout]
 last key block is [ w=-1 s=9223372036854775808 seq=34879845 rcEsfLF3E80PqQPWesW+rlOY2EpXd5UDrW32SzRWgus= C1Hs+q2Vew+WxbGL6PU1P6R2iYUJVJs4032CTS/DQzI= ]
@@ -98,8 +104,8 @@ finished downloading state (-1,8000000000000000,38585739):9E86E166AE7E24BAA22762
 getnextkey: [Error : 651 : not inited]
 getnextkey: [Error : 651 : not inited]
 ```
-
-As you noticed, we have mounted a Docker volume to a local folder **/data/db**. Go inside this folder on your server and check if its size is growing (```sudo du -h .*```)
+As you noticed we have mounted docker volume to a local folder **/data/db**. 
+Go inside this folder on your server and check if its size is growing (```sudo du -h .*```)
 
 Now connect to the running container:
 ```
@@ -109,11 +115,11 @@ and try to connect and execute **getconfig** command via validator-engine-consol
 ```
 validator-engine-console -k client -p server.pub -a localhost:$(jq .control[].port <<< cat /var/ion-work/db/config.json) -c getconfig
 ```
-If you see a JSON output, that means that the validator-engine is up. Now execute the **last** command with a lite-client:
+if you see a json output that means that validator-engine is up, now execute **last** command with a lite-client:
 ```
 lite-client -a localhost:$(jq .liteservers[].port <<< cat /var/ion-work/db/config.json) -p liteserver.pub -c last
 ```
-If you see the following output:
+if you see the following output:
 ```
 conn ready
 failed query: [Error : 652 : adnl query timeout]
@@ -121,15 +127,37 @@ cannot get server version and time (server too old?)
 server version is too old (at least 1.1 with capabilities 1 required), some queries are unavailable
 fatal error executing command-line queries, skipping the rest
 ```
-This means that the lite-server is up, but the node is not synchronized yet.
-
-Once the node is synchronized, the output of the **last** command will be similar to this one:
+it means that the lite-server is up, but the node is not synchronized yet.
+Once the node is synchronized, the output of **last** command will be similar to this one:
 
 ```
 conn ready
 server version is 1.1, capabilities 7
 server time is 1719306580 (delta 0)
-last masterchain block is (-1,8000000000000000,20435927):47A517265B
+last masterchain block is (-1,8000000000000000,20435927):47A517265B25CE4F2C8B3058D46343C070A4B31C5C37745390CE916C7D1CE1C5:279F9AA88C8146257E6C9B537905238C26E37DC2E627F2B6F1D558CB29A6EC82
+server time is 1719306580 (delta 0)
+zerostate id set to -1:823F81F306FF02694F935CF5021548E3CE2B86B529812AF6A12148879E95A128:67E20AC184B9E039A62667ACC3F9C00F90F359A76738233379EFA47604980CE8
+```
+If you can't make it working, refer to the [Troubleshooting](#troubleshooting) section below.
+### Use validator-engine-console
+```docker exec -ti ion-node /bin/bash```
+
+```validator-engine-console -k client -p server.pub -a 127.0.0.1:$(jq .control[].port <<< cat /var/ion-work/db/config.json)```
+
+### Use lite-client
+```docker exec -ti ion-node /bin/bash```
+
+```lite-client -p liteserver.pub -a 127.0.0.1:$(jq .liteservers[].port <<< cat /var/ion-work/db/config.json)```
+
+If you use lite-client outside the Docker container, copy the **liteserver.pub** from the container:
+
+```docker cp ion-node:/var/ion-work/db/liteserver.pub /your/path```
+
+```lite-client -p /your/path/liteserver.pub -a <PUBLIC_IP>:<LITE_PORT>```
+
+### Stop ION docker container
+```
+docker stop ion-node
 ```
 
 ## Kubernetes

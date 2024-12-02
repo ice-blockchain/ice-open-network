@@ -11,14 +11,12 @@ spec:
         claimName: validator-engine-pvc
   containers:
     - name: validator-engine-container
-      image: ghcr.io/ton-blockchain/ton:latest
+      image: ghcr.io/ice-blockchain/ion:latest
       env:
         - name: PUBLIC_IP
           value: "<PUBLIC_IP>"
         - name: GLOBAL_CONFIG_URL
-          value: "https://api.tontech.io/ton/wallet-mainnet.autoconf.json"
-        - name: DUMP_URL
-          value: "https://dump.ton.org/dumps/latest.tar.lz"
+          value: "https://cdn.ice.io/mainnet/global.config.json"
         - name: LITESERVER
           value: "true"
         - name: VALIDATOR_PORT
@@ -36,7 +34,7 @@ spec:
         - name: VERBOSITY
           value: "3"
       volumeMounts:
-        - mountPath: "/var/ton-work/db"
+        - mountPath: "/var/ion-work/db"
           name: validator-engine-pv
       resources:
         requests:
@@ -103,7 +101,7 @@ spec:
             - key: node_type
               operator: In
               values:
-                - ton-validator
+                - ion-validator
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

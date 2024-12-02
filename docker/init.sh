@@ -13,7 +13,7 @@ if [ ! -z "$GLOBAL_CONFIG_URL" ]; then
     wget -q $GLOBAL_CONFIG_URL -O /var/ion-work/db/ion-global.config
 else
     echo -e "\e[1;33m[=]\e[0m No global config provided, downloading mainnet default."
-    wget -q https://api.iontech.io/ion/wallet-mainnet.autoconf.json -O /var/ion-work/db/ion-global.config
+    wget -q https://cdn.ice.io/mainnet/global.config.json -O /var/ion-work/db/ion-global.config
 fi
 
 if [ -z "$VALIDATOR_PORT" ]; then
