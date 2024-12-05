@@ -1,18 +1,18 @@
 /*
-    This file is part of TON Blockchain Library.
+    This file is part of ION Blockchain Library.
 
-    TON Blockchain Library is free software: you can redistribute it and/or modify
+    ION Blockchain Library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
-    TON Blockchain Library is distributed in the hope that it will be useful,
+    ION Blockchain Library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with TON Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
+    along with ION Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "tolk.h"
 #include "src-file.h"
@@ -22,7 +22,7 @@
 #include "openssl/digest.hpp"
 #include "crypto/common/util.h"
 #include "td/utils/crypto.h"
-#include "ton/ton-types.h"
+#include "ion/ion-types.h"
 
 /*
  *   In this module, we convert modern AST representation to legacy representation
@@ -104,8 +104,8 @@ static void fire_error_invalid_mutate_arg_passed(SrcLocation loc, const SymDef* 
 
 // parse address like "EQCRDM9h4k3UJdOePPuyX40mCgA4vxge5Dc5vjBR8djbEKC5"
 // based on unpack_std_smc_addr() from block.cpp
-// (which is not included to avoid linking with ton_crypto)
-static bool parse_friendly_address(const char packed[48], ton::WorkchainId& workchain, ton::StdSmcAddress& addr) {
+// (which is not included to avoid linking with ion_crypto)
+static bool parse_friendly_address(const char packed[48], ion::WorkchainId& workchain, ion::StdSmcAddress& addr) {
   unsigned char buffer[36];
   if (!td::buff_base64_decode(td::MutableSlice{buffer, 36}, td::Slice{packed, 48}, true)) {
     return false;
@@ -121,11 +121,11 @@ static bool parse_friendly_address(const char packed[48], ton::WorkchainId& work
 
 // parse address like "0:527964d55cfa6eb731f4bfc07e9d025098097ef8505519e853986279bd8400d8"
 // based on StdAddress::parse_addr() from block.cpp
-// (which is not included to avoid linking with ton_crypto)
-static bool parse_raw_address(const std::string& acc_string, int& workchain, ton::StdSmcAddress& addr) {
+// (which is not included to avoid linking with ion_crypto)
+static bool parse_raw_address(const std::string& acc_string, int& workchain, ion::StdSmcAddress& addr) {
   size_t pos = acc_string.find(':');
   if (pos != std::string::npos) {
-    td::Result<int> r_wc = td::to_integer_safe<ton::WorkchainId>(acc_string.substr(0, pos));
+    td::Result<int> r_wc = td::to_integer_safe<ion::WorkchainId>(acc_string.substr(0, pos));
     if (r_wc.is_error()) {
       return false;
     }
@@ -656,7 +656,7 @@ static Expr* process_expr(V<ast_string_const> v) {
     }
     case 'a': {  // MsgAddress
       int workchain;
-      ton::StdSmcAddress addr;
+      ion::StdSmcAddress addr;
       bool correct = (str.size() == 48 && parse_friendly_address(str.data(), workchain, addr)) ||
                      (str.size() != 48 && parse_raw_address(str, workchain, addr));
       if (!correct) {
@@ -1034,7 +1034,7 @@ static blk_fl::val process_vertex(V<ast_repeat_statement> v, CodeBlob& code) {
   }
   std::vector<var_idx_t> tmp_vars = expr->pre_compile(code);
   if (tmp_vars.size() != 1) {
-    v->get_cond()->error("repeat count value is not a singleton");
+    v->get_cond()->error("repeat count value is not a singleion");
   }
   Op& repeat_op = code.emplace_back(v->loc, Op::_Repeat, tmp_vars);
   code.push_set_cur(repeat_op.block0);
@@ -1059,7 +1059,7 @@ static blk_fl::val process_vertex(V<ast_while_statement> v, CodeBlob& code) {
   while_op.left = expr->pre_compile(code);
   code.close_pop_cur(v->get_body()->loc);
   if (while_op.left.size() != 1) {
-    v->get_cond()->error("while condition value is not a singleton");
+    v->get_cond()->error("while condition value is not a singleion");
   }
   code.push_set_cur(while_op.block1);
   blk_fl::val res1 = process_vertex(v->get_body(), code);
@@ -1111,7 +1111,7 @@ static blk_fl::val process_vertex(V<ast_do_while_statement> v, CodeBlob& code) {
   until_op.left = expr->pre_compile(code);
   code.close_pop_cur(v->get_body()->loc_end);
   if (until_op.left.size() != 1) {
-    v->get_cond()->error("`while` condition value is not a singleton");
+    v->get_cond()->error("`while` condition value is not a singleion");
   }
   return res & ~blk_fl::empty;
 }
@@ -1203,7 +1203,7 @@ static blk_fl::val process_vertex(V<ast_if_statement> v, CodeBlob& code) {
   }
   std::vector<var_idx_t> tmp_vars = expr->pre_compile(code);
   if (tmp_vars.size() != 1) {
-    v->get_cond()->error("condition value is not a singleton");
+    v->get_cond()->error("condition value is not a singleion");
   }
   Op& if_op = code.emplace_back(v->loc, Op::_If, tmp_vars);
   code.push_set_cur(if_op.block0);

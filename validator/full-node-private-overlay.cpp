@@ -1,37 +1,37 @@
 /*
-    This file is part of TON Blockchain Library.
+    This file is part of ION Blockchain Library.
 
-    TON Blockchain Library is free software: you can redistribute it and/or modify
+    ION Blockchain Library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
-    TON Blockchain Library is distributed in the hope that it will be useful,
+    ION Blockchain Library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with TON Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
+    along with ION Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "full-node-private-overlay.hpp"
-#include "ton/ton-tl.hpp"
+#include "ion/ion-tl.hpp"
 #include "common/delay.h"
 #include "common/checksum.h"
 #include "full-node-serializer.hpp"
 
-namespace ton::validator::fullnode {
+namespace ion::validator::fullnode {
 
-void FullNodePrivateBlockOverlay::process_broadcast(PublicKeyHash src, ton_api::tonNode_blockBroadcast &query) {
+void FullNodePrivateBlockOverlay::process_broadcast(PublicKeyHash src, ion_api::ionNode_blockBroadcast &query) {
   process_block_broadcast(src, query);
 }
 
 void FullNodePrivateBlockOverlay::process_broadcast(PublicKeyHash src,
-                                                    ton_api::tonNode_blockBroadcastCompressed &query) {
+                                                    ion_api::ionNode_blockBroadcastCompressed &query) {
   process_block_broadcast(src, query);
 }
 
-void FullNodePrivateBlockOverlay::process_block_broadcast(PublicKeyHash src, ton_api::tonNode_Broadcast &query) {
+void FullNodePrivateBlockOverlay::process_block_broadcast(PublicKeyHash src, ion_api::ionNode_Broadcast &query) {
   auto B = deserialize_block_broadcast(query, overlay::Overlays::max_fec_broadcast_size());
   if (B.is_error()) {
     LOG(DEBUG) << "dropped broadcast: " << B.move_as_error();
@@ -42,7 +42,7 @@ void FullNodePrivateBlockOverlay::process_block_broadcast(PublicKeyHash src, ton
   td::actor::send_closure(full_node_, &FullNode::process_block_broadcast, B.move_as_ok());
 }
 
-void FullNodePrivateBlockOverlay::process_broadcast(PublicKeyHash src, ton_api::tonNode_newShardBlockBroadcast &query) {
+void FullNodePrivateBlockOverlay::process_broadcast(PublicKeyHash src, ion_api::ionNode_newShardBlockBroadcast &query) {
   BlockIdExt block_id = create_block_id(query.block_->block_);
   VLOG(FULL_NODE_DEBUG) << "Received newShardBlockBroadcast in private overlay from " << src << ": "
                         << block_id.to_str();
@@ -51,17 +51,17 @@ void FullNodePrivateBlockOverlay::process_broadcast(PublicKeyHash src, ton_api::
 }
 
 void FullNodePrivateBlockOverlay::process_broadcast(PublicKeyHash src,
-                                                    ton_api::tonNode_newBlockCandidateBroadcast &query) {
+                                                    ion_api::ionNode_newBlockCandidateBroadcast &query) {
   process_block_candidate_broadcast(src, query);
 }
 
 void FullNodePrivateBlockOverlay::process_broadcast(PublicKeyHash src,
-                                                    ton_api::tonNode_newBlockCandidateBroadcastCompressed &query) {
+                                                    ion_api::ionNode_newBlockCandidateBroadcastCompressed &query) {
   process_block_candidate_broadcast(src, query);
 }
 
 void FullNodePrivateBlockOverlay::process_block_candidate_broadcast(PublicKeyHash src,
-                                                                    ton_api::tonNode_Broadcast &query) {
+                                                                    ion_api::ionNode_Broadcast &query) {
   BlockIdExt block_id;
   CatchainSeqno cc_seqno;
   td::uint32 validator_set_hash;
@@ -89,11 +89,11 @@ void FullNodePrivateBlockOverlay::receive_broadcast(PublicKeyHash src, td::Buffe
   if (adnl::AdnlNodeIdShort{src} == local_id_) {
     return;
   }
-  auto B = fetch_tl_object<ton_api::tonNode_Broadcast>(std::move(broadcast), true);
+  auto B = fetch_tl_object<ion_api::ionNode_Broadcast>(std::move(broadcast), true);
   if (B.is_error()) {
     return;
   }
-  ton_api::downcast_call(*B.move_as_ok(), [src, Self = this](auto &obj) { Self->process_broadcast(src, obj); });
+  ion_api::downcast_call(*B.move_as_ok(), [src, Self = this](auto &obj) { Self->process_broadcast(src, obj); });
 }
 
 void FullNodePrivateBlockOverlay::send_shard_block_info(BlockIdExt block_id, CatchainSeqno cc_seqno,
@@ -102,8 +102,8 @@ void FullNodePrivateBlockOverlay::send_shard_block_info(BlockIdExt block_id, Cat
     return;
   }
   VLOG(FULL_NODE_DEBUG) << "Sending newShardBlockBroadcast in private overlay: " << block_id.to_str();
-  auto B = create_serialize_tl_object<ton_api::tonNode_newShardBlockBroadcast>(
-      create_tl_object<ton_api::tonNode_newShardBlock>(create_tl_block_id(block_id), cc_seqno, std::move(data)));
+  auto B = create_serialize_tl_object<ion_api::ionNode_newShardBlockBroadcast>(
+      create_tl_object<ion_api::ionNode_newShardBlock>(create_tl_block_id(block_id), cc_seqno, std::move(data)));
   if (B.size() <= overlay::Overlays::max_simple_broadcast_size()) {
     td::actor::send_closure(overlays_, &overlay::Overlays::send_broadcast_ex, local_id_, overlay_id_,
                             local_id_.pubkey_hash(), 0, std::move(B));
@@ -152,7 +152,7 @@ void FullNodePrivateBlockOverlay::start_up() {
   for (const adnl::AdnlNodeIdShort &id : nodes_) {
     nodes.push_back(id.bits256_value());
   }
-  auto X = create_hash_tl_object<ton_api::tonNode_privateBlockOverlayId>(zero_state_file_hash_, std::move(nodes));
+  auto X = create_hash_tl_object<ion_api::ionNode_privateBlockOverlayId>(zero_state_file_hash_, std::move(nodes));
   td::BufferSlice b{32};
   b.as_slice().copy_from(as_slice(X));
   overlay_id_full_ = overlay::OverlayIdFull{std::move(b)};
@@ -210,19 +210,19 @@ void FullNodePrivateBlockOverlay::init() {
 
 void FullNodePrivateBlockOverlay::tear_down() {
   if (inited_) {
-    td::actor::send_closure(overlays_, &ton::overlay::Overlays::delete_overlay, local_id_, overlay_id_);
+    td::actor::send_closure(overlays_, &ion::overlay::Overlays::delete_overlay, local_id_, overlay_id_);
   }
 }
 
-void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src, ton_api::tonNode_blockBroadcast &query) {
+void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src, ion_api::ionNode_blockBroadcast &query) {
   process_block_broadcast(src, query);
 }
 
-void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src, ton_api::tonNode_blockBroadcastCompressed &query) {
+void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src, ion_api::ionNode_blockBroadcastCompressed &query) {
   process_block_broadcast(src, query);
 }
 
-void FullNodeCustomOverlay::process_block_broadcast(PublicKeyHash src, ton_api::tonNode_Broadcast &query) {
+void FullNodeCustomOverlay::process_block_broadcast(PublicKeyHash src, ion_api::ionNode_Broadcast &query) {
   if (!block_senders_.count(adnl::AdnlNodeIdShort(src))) {
     VLOG(FULL_NODE_DEBUG) << "Dropping block broadcast in private overlay \"" << name_ << "\" from unauthorized sender "
                           << src;
@@ -238,7 +238,7 @@ void FullNodeCustomOverlay::process_block_broadcast(PublicKeyHash src, ton_api::
   td::actor::send_closure(full_node_, &FullNode::process_block_broadcast, B.move_as_ok());
 }
 
-void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src, ton_api::tonNode_externalMessageBroadcast &query) {
+void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src, ion_api::ionNode_externalMessageBroadcast &query) {
   auto it = msg_senders_.find(adnl::AdnlNodeIdShort{src});
   if (it == msg_senders_.end()) {
     VLOG(FULL_NODE_DEBUG) << "Dropping external message broadcast in custom overlay \"" << name_
@@ -251,16 +251,16 @@ void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src, ton_api::tonNod
                           std::move(query.message_->data_), it->second);
 }
 
-void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src, ton_api::tonNode_newBlockCandidateBroadcast &query) {
+void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src, ion_api::ionNode_newBlockCandidateBroadcast &query) {
   process_block_candidate_broadcast(src, query);
 }
 
 void FullNodeCustomOverlay::process_broadcast(PublicKeyHash src,
-                                              ton_api::tonNode_newBlockCandidateBroadcastCompressed &query) {
+                                              ion_api::ionNode_newBlockCandidateBroadcastCompressed &query) {
   process_block_candidate_broadcast(src, query);
 }
 
-void FullNodeCustomOverlay::process_block_candidate_broadcast(PublicKeyHash src, ton_api::tonNode_Broadcast &query) {
+void FullNodeCustomOverlay::process_block_candidate_broadcast(PublicKeyHash src, ion_api::ionNode_Broadcast &query) {
   if (!block_senders_.count(adnl::AdnlNodeIdShort(src))) {
     VLOG(FULL_NODE_DEBUG) << "Dropping block candidate broadcast in private overlay \"" << name_
                           << "\" from unauthorized sender " << src;
@@ -294,11 +294,11 @@ void FullNodeCustomOverlay::receive_broadcast(PublicKeyHash src, td::BufferSlice
   if (adnl::AdnlNodeIdShort{src} == local_id_) {
     return;
   }
-  auto B = fetch_tl_object<ton_api::tonNode_Broadcast>(std::move(broadcast), true);
+  auto B = fetch_tl_object<ion_api::ionNode_Broadcast>(std::move(broadcast), true);
   if (B.is_error()) {
     return;
   }
-  ton_api::downcast_call(*B.move_as_ok(), [src, Self = this](auto &obj) { Self->process_broadcast(src, obj); });
+  ion_api::downcast_call(*B.move_as_ok(), [src, Self = this](auto &obj) { Self->process_broadcast(src, obj); });
 }
 
 void FullNodeCustomOverlay::send_external_message(td::BufferSlice data) {
@@ -306,8 +306,8 @@ void FullNodeCustomOverlay::send_external_message(td::BufferSlice data) {
     return;
   }
   VLOG(FULL_NODE_DEBUG) << "Sending external message to custom overlay \"" << name_ << "\"";
-  auto B = create_serialize_tl_object<ton_api::tonNode_externalMessageBroadcast>(
-      create_tl_object<ton_api::tonNode_externalMessage>(std::move(data)));
+  auto B = create_serialize_tl_object<ion_api::ionNode_externalMessageBroadcast>(
+      create_tl_object<ion_api::ionNode_externalMessage>(std::move(data)));
   if (B.size() <= overlay::Overlays::max_simple_broadcast_size()) {
     td::actor::send_closure(overlays_, &overlay::Overlays::send_broadcast_ex, local_id_, overlay_id_,
                             local_id_.pubkey_hash(), 0, std::move(B));
@@ -355,7 +355,7 @@ void FullNodeCustomOverlay::start_up() {
   for (const adnl::AdnlNodeIdShort &id : nodes_) {
     nodes.push_back(id.bits256_value());
   }
-  auto X = create_hash_tl_object<ton_api::tonNode_customOverlayId>(zero_state_file_hash_, name_, std::move(nodes));
+  auto X = create_hash_tl_object<ion_api::ionNode_customOverlayId>(zero_state_file_hash_, name_, std::move(nodes));
   td::BufferSlice b{32};
   b.as_slice().copy_from(as_slice(X));
   overlay_id_full_ = overlay::OverlayIdFull{std::move(b)};
@@ -420,7 +420,7 @@ void FullNodeCustomOverlay::init() {
 
 void FullNodeCustomOverlay::tear_down() {
   LOG(FULL_NODE_WARNING) << "Destroying custom overlay \"" << name_ << "\" for adnl id " << local_id_;
-  td::actor::send_closure(overlays_, &ton::overlay::Overlays::delete_overlay, local_id_, overlay_id_);
+  td::actor::send_closure(overlays_, &ion::overlay::Overlays::delete_overlay, local_id_, overlay_id_);
 }
 
-}  // namespace ton::validator::fullnode
+}  // namespace ion::validator::fullnode

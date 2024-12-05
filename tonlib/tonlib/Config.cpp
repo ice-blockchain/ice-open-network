@@ -1,18 +1,18 @@
 /*
-    This file is part of TON Blockchain Library.
+    This file is part of ION Blockchain Library.
 
-    TON Blockchain Library is free software: you can redistribute it and/or modify
+    ION Blockchain Library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
-    TON Blockchain Library is distributed in the hope that it will be useful,
+    ION Blockchain Library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with TON Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
+    along with ION Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright 2017-2020 Telegram Systems LLP
 */
@@ -21,43 +21,43 @@
 #include "td/utils/JsonBuilder.h"
 
 namespace tonlib {
-td::Result<ton::BlockIdExt> parse_block_id_ext(td::JsonObject &obj) {
-  ton::WorkchainId zero_workchain_id;
+td::Result<ion::BlockIdExt> parse_block_id_ext(td::JsonObject &obj) {
+  ion::WorkchainId zero_workchain_id;
   {
     TRY_RESULT(wc, td::get_json_object_int_field(obj, "workchain"));
     zero_workchain_id = wc;
   }
-  ton::ShardId zero_shard_id;  // uint64
+  ion::ShardId zero_shard_id;  // uint64
   {
     TRY_RESULT(shard_id, td::get_json_object_long_field(obj, "shard"));
-    zero_shard_id = static_cast<ton::ShardId>(shard_id);
+    zero_shard_id = static_cast<ion::ShardId>(shard_id);
   }
-  ton::BlockSeqno zero_seqno;
+  ion::BlockSeqno zero_seqno;
   {
     TRY_RESULT(seqno, td::get_json_object_int_field(obj, "seqno"));
     zero_seqno = seqno;
   }
 
-  ton::RootHash zero_root_hash;
+  ion::RootHash zero_root_hash;
   {
     TRY_RESULT(hash_b64, td::get_json_object_string_field(obj, "root_hash"));
     TRY_RESULT(hash, td::base64_decode(hash_b64));
-    if (hash.size() * 8 != ton::RootHash::size()) {
+    if (hash.size() * 8 != ion::RootHash::size()) {
       return td::Status::Error("Invalid config (8)");
     }
-    zero_root_hash = ton::RootHash(td::ConstBitPtr(td::Slice(hash).ubegin()));
+    zero_root_hash = ion::RootHash(td::ConstBitPtr(td::Slice(hash).ubegin()));
   }
-  ton::FileHash zero_file_hash;
+  ion::FileHash zero_file_hash;
   {
     TRY_RESULT(hash_b64, td::get_json_object_string_field(obj, "file_hash"));
     TRY_RESULT(hash, td::base64_decode(hash_b64));
-    if (hash.size() * 8 != ton::FileHash::size()) {
+    if (hash.size() * 8 != ion::FileHash::size()) {
       return td::Status::Error("Invalid config (9)");
     }
-    zero_file_hash = ton::RootHash(td::ConstBitPtr(td::Slice(hash).ubegin()));
+    zero_file_hash = ion::RootHash(td::ConstBitPtr(td::Slice(hash).ubegin()));
   }
 
-  return ton::BlockIdExt(zero_workchain_id, zero_shard_id, zero_seqno, std::move(zero_root_hash),
+  return ion::BlockIdExt(zero_workchain_id, zero_shard_id, zero_seqno, std::move(zero_root_hash),
                          std::move(zero_file_hash));
 }
 td::Result<Config> Config::parse(std::string str) {
@@ -101,7 +101,7 @@ td::Result<Config> Config::parse(std::string str) {
       return td::Status::Error("Invalid config (6)");
     }
 
-    client.adnl_id = ton::adnl::AdnlNodeIdFull(ton::pubkeys::Ed25519(td::Bits256(td::Slice(key).ubegin())));
+    client.adnl_id = ion::adnl::AdnlNodeIdFull(ion::pubkeys::Ed25519(td::Bits256(td::Slice(key).ubegin())));
     res.lite_clients.push_back(std::move(client));
   }
 

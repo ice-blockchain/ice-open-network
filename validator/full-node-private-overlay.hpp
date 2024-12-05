@@ -1,36 +1,36 @@
 /*
-    This file is part of TON Blockchain Library.
+    This file is part of ION Blockchain Library.
 
-    TON Blockchain Library is free software: you can redistribute it and/or modify
+    ION Blockchain Library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
-    TON Blockchain Library is distributed in the hope that it will be useful,
+    ION Blockchain Library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with TON Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
+    along with ION Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
 #include "full-node.h"
 
-namespace ton::validator::fullnode {
+namespace ion::validator::fullnode {
 
 class FullNodePrivateBlockOverlay : public td::actor::Actor {
  public:
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_blockBroadcast &query);
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_blockBroadcastCompressed &query);
-  void process_block_broadcast(PublicKeyHash src, ton_api::tonNode_Broadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_blockBroadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_blockBroadcastCompressed &query);
+  void process_block_broadcast(PublicKeyHash src, ion_api::ionNode_Broadcast &query);
 
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_newShardBlockBroadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_newShardBlockBroadcast &query);
 
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_newBlockCandidateBroadcast &query);
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_newBlockCandidateBroadcastCompressed &query);
-  void process_block_candidate_broadcast(PublicKeyHash src, ton_api::tonNode_Broadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_newBlockCandidateBroadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_newBlockCandidateBroadcastCompressed &query);
+  void process_block_candidate_broadcast(PublicKeyHash src, ion_api::ionNode_Broadcast &query);
 
   template <class T>
   void process_broadcast(PublicKeyHash, T &) {
@@ -95,15 +95,15 @@ class FullNodePrivateBlockOverlay : public td::actor::Actor {
 
 class FullNodeCustomOverlay : public td::actor::Actor {
  public:
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_blockBroadcast &query);
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_blockBroadcastCompressed &query);
-  void process_block_broadcast(PublicKeyHash src, ton_api::tonNode_Broadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_blockBroadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_blockBroadcastCompressed &query);
+  void process_block_broadcast(PublicKeyHash src, ion_api::ionNode_Broadcast &query);
 
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_externalMessageBroadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_externalMessageBroadcast &query);
 
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_newBlockCandidateBroadcast &query);
-  void process_broadcast(PublicKeyHash src, ton_api::tonNode_newBlockCandidateBroadcastCompressed &query);
-  void process_block_candidate_broadcast(PublicKeyHash src, ton_api::tonNode_Broadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_newBlockCandidateBroadcast &query);
+  void process_broadcast(PublicKeyHash src, ion_api::ionNode_newBlockCandidateBroadcastCompressed &query);
+  void process_block_candidate_broadcast(PublicKeyHash src, ion_api::ionNode_Broadcast &query);
 
   template <class T>
   void process_broadcast(PublicKeyHash, T &) {
@@ -170,4 +170,4 @@ class FullNodeCustomOverlay : public td::actor::Actor {
   void init();
 };
 
-}  // namespace ton::validator::fullnode
+}  // namespace ion::validator::fullnode

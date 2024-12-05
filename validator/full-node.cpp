@@ -1,28 +1,28 @@
 /*
-    This file is part of TON Blockchain Library.
+    This file is part of ION Blockchain Library.
 
-    TON Blockchain Library is free software: you can redistribute it and/or modify
+    ION Blockchain Library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
-    TON Blockchain Library is distributed in the hope that it will be useful,
+    ION Blockchain Library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with TON Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
+    along with ION Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright 2017-2020 Telegram Systems LLP
 */
 #include "full-node.hpp"
-#include "ton/ton-shard.h"
-#include "ton/ton-io.hpp"
+#include "ion/ion-shard.h"
+#include "ion/ion-io.hpp"
 #include "td/actor/MultiPromise.h"
 #include "full-node.h"
 
-namespace ton {
+namespace ion {
 
 namespace validator {
 
@@ -98,7 +98,7 @@ void FullNodeImpl::sign_shard_overlay_certificate(ShardIdFull shard_id, PublicKe
 }
 
 void FullNodeImpl::import_shard_overlay_certificate(ShardIdFull shard_id, PublicKeyHash signed_key,
-                                                    std::shared_ptr<ton::overlay::Certificate> cert,
+                                                    std::shared_ptr<ion::overlay::Certificate> cert,
                                                     td::Promise<td::Unit> promise) {
     auto it = shards_.find(shard_id);
     if(it == shards_.end()) {
@@ -464,10 +464,10 @@ void FullNodeImpl::start_up() {
   add_shard(ShardIdFull{masterchainId});
   if (local_id_.is_zero()) {
     if(adnl_id_.is_zero()) {
-      auto pk = ton::PrivateKey{ton::privkeys::Ed25519::random()};
+      auto pk = ion::PrivateKey{ion::privkeys::Ed25519::random()};
       local_id_ = pk.compute_short_id();
 
-      td::actor::send_closure(keyring_, &ton::keyring::Keyring::add_key, std::move(pk), true, [](td::Unit) {});
+      td::actor::send_closure(keyring_, &ion::keyring::Keyring::add_key, std::move(pk), true, [](td::Unit) {});
     } else {
       local_id_ = adnl_id_.pubkey_hash();
     }
@@ -666,7 +666,7 @@ FullNodeImpl::FullNodeImpl(PublicKeyHash local_id, adnl::AdnlNodeIdShort adnl_id
     , config_(config) {
 }
 
-td::actor::ActorOwn<FullNode> FullNode::create(ton::PublicKeyHash local_id, adnl::AdnlNodeIdShort adnl_id,
+td::actor::ActorOwn<FullNode> FullNode::create(ion::PublicKeyHash local_id, adnl::AdnlNodeIdShort adnl_id,
                                                FileHash zero_state_file_hash, FullNodeConfig config,
                                                td::actor::ActorId<keyring::Keyring> keyring,
                                                td::actor::ActorId<adnl::Adnl> adnl, td::actor::ActorId<rldp::Rldp> rldp,
@@ -678,12 +678,12 @@ td::actor::ActorOwn<FullNode> FullNode::create(ton::PublicKeyHash local_id, adnl
                                                adnl, rldp, rldp2, dht, overlays, validator_manager, client, db_root);
 }
 
-FullNodeConfig::FullNodeConfig(const tl_object_ptr<ton_api::engine_validator_fullNodeConfig> &obj)
+FullNodeConfig::FullNodeConfig(const tl_object_ptr<ion_api::engine_validator_fullNodeConfig> &obj)
     : ext_messages_broadcast_disabled_(obj->ext_messages_broadcast_disabled_) {
 }
 
-tl_object_ptr<ton_api::engine_validator_fullNodeConfig> FullNodeConfig::tl() const {
-  return create_tl_object<ton_api::engine_validator_fullNodeConfig>(ext_messages_broadcast_disabled_);
+tl_object_ptr<ion_api::engine_validator_fullNodeConfig> FullNodeConfig::tl() const {
+  return create_tl_object<ion_api::engine_validator_fullNodeConfig>(ext_messages_broadcast_disabled_);
 }
 bool FullNodeConfig::operator==(const FullNodeConfig &rhs) const {
   return ext_messages_broadcast_disabled_ == rhs.ext_messages_broadcast_disabled_;
@@ -692,13 +692,13 @@ bool FullNodeConfig::operator!=(const FullNodeConfig &rhs) const {
   return !(*this == rhs);
 }
 
-CustomOverlayParams CustomOverlayParams::fetch(const ton_api::engine_validator_customOverlay& f) {
+CustomOverlayParams CustomOverlayParams::fetch(const ion_api::engine_validator_customOverlay& f) {
   CustomOverlayParams c;
   c.name_ = f.name_;
   for (const auto &node : f.nodes_) {
     c.nodes_.emplace_back(node->adnl_id_);
     if (node->msg_sender_) {
-      c.msg_senders_[ton::adnl::AdnlNodeIdShort{node->adnl_id_}] = node->msg_sender_priority_;
+      c.msg_senders_[ion::adnl::AdnlNodeIdShort{node->adnl_id_}] = node->msg_sender_priority_;
     }
     if (node->block_sender_) {
       c.block_senders_.emplace(node->adnl_id_);
@@ -711,4 +711,4 @@ CustomOverlayParams CustomOverlayParams::fetch(const ton_api::engine_validator_c
 
 }  // namespace validator
 
-}  // namespace ton
+}  // namespace ion

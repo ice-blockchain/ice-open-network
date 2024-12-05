@@ -1,5 +1,5 @@
 # Global versions
-Global version is a parameter specified in `ConfigParam 8` ([block.tlb](https://github.com/ton-blockchain/ton/blob/master/crypto/block/block.tlb#L595)).
+Global version is a parameter specified in `ConfigParam 8` ([block.tlb](https://github.com/ice-blockchain/ion/blob/master/crypto/block/block.tlb#L595)).
 Various features are enabled depending on the global version.
 
 ## Version 4
@@ -17,7 +17,7 @@ Various features are enabled depending on the global version.
 * `P256_CHKSIGNS`, `P256_CHKSIGNU`
 
 ### Division
-[Division instruction](https://ton.org/docs/learn/tvm-instructions/instructions#52-division) can add a number to the
+[Division instruction](https://ion.org/docs/learn/tvm-instructions/instructions#52-division) can add a number to the
 intermediate value before division (e.g. `(xy+w)/z`).
 
 ### Stack operations
@@ -48,7 +48,7 @@ Previously only ticktock transactions had this limit, while ordinary transaction
 * Gas usage of special contracts is not taken into account when checking block limits. This allows keeping masterchain block limits low
 while having high gas limits for elector.
 * Gas limit on `EQD_v9j1rlsuHHw2FIhcsCFFSD367ldfDdCKcsNmNpIRzUlu` is increased to `special_gas_limit * 2` until 2024-02-29.
-See [this post](https://t.me/tonstatus/88) for details.
+See [this post](https://t.me/ionstatus/88) for details.
 
 ### Loading libraries
 * Loading "nested libraries" (i.e. a library cell that points to another library cell) throws an exception.
@@ -67,7 +67,7 @@ See [this post](https://t.me/tonstatus/88) for details.
   * **4**: `ConfigParam 24` (mc fwd fees).
   * **5**: `ConfigParam 25` (fwd fees).
   * **6**: `ConfigParam 43` (size limits).
-* **15**: "[due payment](https://github.com/ton-blockchain/ton/blob/8a9ff339927b22b72819c5125428b70c406da631/crypto/block/block.tlb#L237)" - current debt for storage fee (nanotons). Asm opcode: `DUEPAYMENT`.
+* **15**: "[due payment](https://github.com/ice-blockchain/ion/blob/8a9ff339927b22b72819c5125428b70c406da631/crypto/block/block.tlb#L237)" - current debt for storage fee (nanoions). Asm opcode: `DUEPAYMENT`.
 * **16**: "precompiled gas usage" - gas usage for the current contract if it is precompiled (see `ConfigParam 45`), `null` otherwise. Asm opcode: `GETPRECOMPILEDGAS`.
 
 ### New TVM instructions
@@ -101,7 +101,7 @@ Operations for working with Merkle proofs, where cells can have non-zero level a
 
 ## Version 7
 
-[Explicitly nullify](https://github.com/ton-blockchain/ton/pull/957/files) `due_payment` after due reimbursment.
+[Explicitly nullify](https://github.com/ice-blockchain/ion/pull/957/files) `due_payment` after due reimbursment.
 
 ## Version 8
 

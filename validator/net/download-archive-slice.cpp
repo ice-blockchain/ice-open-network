@@ -1,18 +1,18 @@
 /*
-    This file is part of TON Blockchain Library.
+    This file is part of ION Blockchain Library.
 
-    TON Blockchain Library is free software: you can redistribute it and/or modify
+    ION Blockchain Library is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
-    TON Blockchain Library is distributed in the hope that it will be useful,
+    ION Blockchain Library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with TON Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
+    along with ION Blockchain Library.  If not, see <http://www.gnu.org/licenses/>.
 
     Copyright 2017-2020 Telegram Systems LLP
 */
@@ -20,7 +20,7 @@
 #include "td/utils/port/path.h"
 #include "td/utils/overloaded.h"
 
-namespace ton {
+namespace ion {
 
 namespace validator {
 
@@ -114,19 +114,19 @@ void DownloadArchiveSlice::got_node_to_download(adnl::AdnlNodeIdShort download_f
     }
   });
 
-  auto q = create_serialize_tl_object<ton_api::tonNode_getArchiveInfo>(masterchain_seqno_);
+  auto q = create_serialize_tl_object<ion_api::ionNode_getArchiveInfo>(masterchain_seqno_);
   if (client_.empty()) {
     td::actor::send_closure(overlays_, &overlay::Overlays::send_query, download_from_, local_id_, overlay_id_,
                             "get_archive_info", std::move(P), td::Timestamp::in(3.0), std::move(q));
   } else {
     td::actor::send_closure(client_, &adnl::AdnlExtClient::send_query, "get_archive_info",
-                            create_serialize_tl_object_suffix<ton_api::tonNode_query>(std::move(q)),
+                            create_serialize_tl_object_suffix<ion_api::ionNode_query>(std::move(q)),
                             td::Timestamp::in(1.0), std::move(P));
   }
 }
 
 void DownloadArchiveSlice::got_archive_info(td::BufferSlice data) {
-  auto F = fetch_tl_object<ton_api::tonNode_ArchiveInfo>(std::move(data), true);
+  auto F = fetch_tl_object<ion_api::ionNode_ArchiveInfo>(std::move(data), true);
   if (F.is_error()) {
     abort_query(F.move_as_error_prefix("failed to parse ArchiveInfo answer"));
     return;
@@ -134,12 +134,12 @@ void DownloadArchiveSlice::got_archive_info(td::BufferSlice data) {
   auto f = F.move_as_ok();
 
   bool fail = false;
-  ton_api::downcast_call(*f.get(), td::overloaded(
-                                       [&](const ton_api::tonNode_archiveNotFound &obj) {
+  ion_api::downcast_call(*f.get(), td::overloaded(
+                                       [&](const ion_api::ionNode_archiveNotFound &obj) {
                                          abort_query(td::Status::Error(ErrorCode::notready, "remote db not found"));
                                          fail = true;
                                        },
-                                       [&](const ton_api::tonNode_archiveInfo &obj) { archive_id_ = obj.id_; }));
+                                       [&](const ion_api::ionNode_archiveInfo &obj) { archive_id_ = obj.id_; }));
   if (fail) {
     return;
   }
@@ -158,14 +158,14 @@ void DownloadArchiveSlice::get_archive_slice() {
     }
   });
 
-  auto q = create_serialize_tl_object<ton_api::tonNode_getArchiveSlice>(archive_id_, offset_, slice_size());
+  auto q = create_serialize_tl_object<ion_api::ionNode_getArchiveSlice>(archive_id_, offset_, slice_size());
   if (client_.empty()) {
     td::actor::send_closure(overlays_, &overlay::Overlays::send_query_via, download_from_, local_id_, overlay_id_,
                             "get_archive_slice", std::move(P), td::Timestamp::in(15.0), std::move(q),
                             slice_size() + 1024, rldp_);
   } else {
     td::actor::send_closure(client_, &adnl::AdnlExtClient::send_query, "get_archive_slice",
-                            create_serialize_tl_object_suffix<ton_api::tonNode_query>(std::move(q)),
+                            create_serialize_tl_object_suffix<ion_api::ionNode_query>(std::move(q)),
                             td::Timestamp::in(15.0), std::move(P));
   }
 }
@@ -203,4 +203,4 @@ void DownloadArchiveSlice::got_archive_slice(td::BufferSlice data) {
 
 }  // namespace validator
 
-}  // namespace ton
+}  // namespace ion

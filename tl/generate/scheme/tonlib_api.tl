@@ -47,12 +47,12 @@ unpackedAccountAddress workchain_id:int32 bounceable:Bool testnet:Bool addr:byte
 
 internal.transactionId lt:int64 hash:bytes = internal.TransactionId;
 
-ton.blockId workchain:int32 shard:int64 seqno:int32 = internal.BlockId;
-ton.blockIdExt workchain:int32 shard:int64 seqno:int32 root_hash:bytes file_hash:bytes = ton.BlockIdExt;
+ion.blockId workchain:int32 shard:int64 seqno:int32 = internal.BlockId;
+ion.blockIdExt workchain:int32 shard:int64 seqno:int32 root_hash:bytes file_hash:bytes = ion.BlockIdExt;
 
 extraCurrency id:int32 amount:int64 = ExtraCurrency;
 
-raw.fullAccountState balance:int64 extra_currencies:vector<extraCurrency> code:bytes data:bytes last_transaction_id:internal.transactionId block_id:ton.blockIdExt frozen_hash:bytes sync_utime:int53 = raw.FullAccountState;
+raw.fullAccountState balance:int64 extra_currencies:vector<extraCurrency> code:bytes data:bytes last_transaction_id:internal.transactionId block_id:ion.blockIdExt frozen_hash:bytes sync_utime:int53 = raw.FullAccountState;
 raw.message source:accountAddress destination:accountAddress value:int64 extra_currencies:vector<extraCurrency> fwd_fee:int64 ihr_fee:int64 created_lt:int64 body_hash:bytes msg_data:msg.Data = raw.Message;
 raw.transaction address:accountAddress utime:int53 data:bytes transaction_id:internal.transactionId fee:int64 storage_fee:int64 other_fee:int64 in_msg:raw.message out_msgs:vector<raw.message> = raw.Transaction;
 raw.transactions transactions:vector<raw.transaction> previous_transaction_id:internal.transactionId = raw.Transactions;
@@ -89,7 +89,7 @@ pchan.statePayout A:int64 B:int64 = pchan.State;
 pchan.accountState config:pchan.config state:pchan.State description:string = AccountState;
 uninited.accountState frozen_hash:bytes = AccountState;
 
-fullAccountState address:accountAddress balance:int64 extra_currencies:vector<extraCurrency> last_transaction_id:internal.transactionId block_id:ton.blockIdExt sync_utime:int53 account_state:AccountState revision:int32 = FullAccountState;
+fullAccountState address:accountAddress balance:int64 extra_currencies:vector<extraCurrency> last_transaction_id:internal.transactionId block_id:ion.blockIdExt sync_utime:int53 account_state:AccountState revision:int32 = FullAccountState;
 
 accountRevisionList revisions:vector<fullAccountState> = AccountRevisionList;
 accountList accounts:vector<fullAccountState> = AccountList;
@@ -218,21 +218,21 @@ data bytes:secureBytes = Data;
 liteServer.info now:int53 version:int32 capabilities:int64 = liteServer.Info;
 
 
-blocks.masterchainInfo last:ton.BlockIdExt state_root_hash:bytes init:ton.BlockIdExt = blocks.MasterchainInfo;
-blocks.shards shards:vector<ton.BlockIdExt> = blocks.Shards;
+blocks.masterchainInfo last:ion.BlockIdExt state_root_hash:bytes init:ion.BlockIdExt = blocks.MasterchainInfo;
+blocks.shards shards:vector<ion.BlockIdExt> = blocks.Shards;
 blocks.accountTransactionId account:bytes lt:int64 = blocks.AccountTransactionId;
 blocks.shortTxId mode:# account:mode.0?bytes lt:mode.1?int64 hash:mode.2?bytes = liteServer.TransactionId;
-blocks.transactions id:ton.blockIdExt req_count:int32 incomplete:Bool transactions:vector<blocks.shortTxId> = blocks.Transactions;
-blocks.transactionsExt id:ton.blockIdExt req_count:int32 incomplete:Bool transactions:vector<raw.transaction> = blocks.TransactionsExt;
-blocks.header id:ton.blockIdExt global_id:int32 version:int32 flags:# after_merge:Bool after_split:Bool before_split:Bool want_merge:Bool want_split:Bool validator_list_hash_short:int32 catchain_seqno:int32 min_ref_mc_seqno:int32 is_key_block:Bool prev_key_block_seqno:int32 start_lt:int64 end_lt:int64 gen_utime:int53 vert_seqno:# prev_blocks:vector<ton.blockIdExt> = blocks.Header;
+blocks.transactions id:ion.blockIdExt req_count:int32 incomplete:Bool transactions:vector<blocks.shortTxId> = blocks.Transactions;
+blocks.transactionsExt id:ion.blockIdExt req_count:int32 incomplete:Bool transactions:vector<raw.transaction> = blocks.TransactionsExt;
+blocks.header id:ion.blockIdExt global_id:int32 version:int32 flags:# after_merge:Bool after_split:Bool before_split:Bool want_merge:Bool want_split:Bool validator_list_hash_short:int32 catchain_seqno:int32 min_ref_mc_seqno:int32 is_key_block:Bool prev_key_block_seqno:int32 start_lt:int64 end_lt:int64 gen_utime:int53 vert_seqno:# prev_blocks:vector<ion.blockIdExt> = blocks.Header;
 //blocks.shortData header:blocks.Header transactions:blocks.Header = blocks.BlockData;
 
 blocks.signature node_id_short:int256 signature:bytes = blocks.Signature;
-blocks.blockSignatures id:ton.blockIdExt signatures:(vector blocks.signature) = blocks.BlockSignatures;
-blocks.shardBlockLink id:ton.blockIdExt proof:bytes = blocks.ShardBlockLink;
-blocks.blockLinkBack to_key_block:Bool from:ton.blockIdExt to:ton.blockIdExt dest_proof:bytes proof:bytes state_proof:bytes = blocks.BlockLinkBack;
-blocks.shardBlockProof from:ton.blockIdExt mc_id:ton.blockIdExt links:(vector blocks.shardBlockLink) mc_proof:(vector blocks.blockLinkBack) = blocks.ShardBlockProof;
-blocks.outMsgQueueSize id:ton.blockIdExt size:int32 = blocks.OutMsgQueueSize;
+blocks.blockSignatures id:ion.blockIdExt signatures:(vector blocks.signature) = blocks.BlockSignatures;
+blocks.shardBlockLink id:ion.blockIdExt proof:bytes = blocks.ShardBlockLink;
+blocks.blockLinkBack to_key_block:Bool from:ion.blockIdExt to:ion.blockIdExt dest_proof:bytes proof:bytes state_proof:bytes = blocks.BlockLinkBack;
+blocks.shardBlockProof from:ion.blockIdExt mc_id:ion.blockIdExt links:(vector blocks.shardBlockLink) mc_proof:(vector blocks.blockLinkBack) = blocks.ShardBlockProof;
+blocks.outMsgQueueSize id:ion.blockIdExt size:int32 = blocks.OutMsgQueueSize;
 blocks.outMsgQueueSizes shards:(vector blocks.outMsgQueueSize) ext_msg_queue_size_limit:int32 = blocks.OutMsgQueueSizes;
 
 configInfo config:tvm.cell = ConfigInfo;
@@ -276,7 +276,7 @@ raw.sendMessageReturnHash body:bytes = raw.ExtMessageInfo;
 raw.createAndSendMessage destination:accountAddress initial_account_state:bytes data:bytes = Ok;
 raw.createQuery destination:accountAddress init_code:bytes init_data:bytes body:bytes = query.Info;
 
-sync = ton.BlockIdExt;
+sync = ion.BlockIdExt;
 
 // revision = 0 -- use default revision
 // revision = x (x > 0) -- use revision x
@@ -329,19 +329,19 @@ pchan.unpackPromise data:secureBytes = pchan.Promise;
 
 
 blocks.getMasterchainInfo = blocks.MasterchainInfo;
-blocks.getShards id:ton.blockIdExt = blocks.Shards;
-blocks.lookupBlock mode:int32 id:ton.blockId lt:int64 utime:int32 = ton.BlockIdExt;
-blocks.getTransactions id:ton.blockIdExt mode:# count:# after:blocks.accountTransactionId = blocks.Transactions;
-blocks.getTransactionsExt id:ton.blockIdExt mode:# count:# after:blocks.accountTransactionId = blocks.TransactionsExt;
-blocks.getBlockHeader id:ton.blockIdExt = blocks.Header;
+blocks.getShards id:ion.blockIdExt = blocks.Shards;
+blocks.lookupBlock mode:int32 id:ion.blockId lt:int64 utime:int32 = ion.BlockIdExt;
+blocks.getTransactions id:ion.blockIdExt mode:# count:# after:blocks.accountTransactionId = blocks.Transactions;
+blocks.getTransactionsExt id:ion.blockIdExt mode:# count:# after:blocks.accountTransactionId = blocks.TransactionsExt;
+blocks.getBlockHeader id:ion.blockIdExt = blocks.Header;
 blocks.getMasterchainBlockSignatures seqno:int32 = blocks.BlockSignatures;
-blocks.getShardBlockProof id:ton.blockIdExt mode:# from:mode.0?ton.blockIdExt = blocks.ShardBlockProof;
+blocks.getShardBlockProof id:ion.blockIdExt mode:# from:mode.0?ion.blockIdExt = blocks.ShardBlockProof;
 blocks.getOutMsgQueueSizes mode:# wc:mode.0?int32 shard:mode.0?int64 = blocks.OutMsgQueueSizes;
 
 onLiteServerQueryResult id:int64 bytes:bytes = Ok;
 onLiteServerQueryError id:int64 error:error = Ok;
 
-withBlock id:ton.blockIdExt function:Function = Object;
+withBlock id:ion.blockIdExt function:Function = Object;
 
 runTests dir:string = Ok;
 
